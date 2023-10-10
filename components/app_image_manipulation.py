@@ -55,7 +55,7 @@ class AppImageManipulation:
         self.list_views_config()
 
     def config_frame(self):
-        self.master.title("Manipulação de Imagem")
+        self.master.title("PDI Bimestral")
         self.master.geometry("1200x550")
         self.master.configure(bg="#363636")
 
@@ -66,21 +66,18 @@ class AppImageManipulation:
         self.frame_buttons.pack(side="right", pady=10, padx=10)
 
         self.load_image_button = tk.Button(self.frame_buttons, text="Send Image", command=self.open_file, bg="black", fg="white")
-        self.load_image_button.pack(side="top", pady=10)
+        self.load_image_button.pack(side="top", pady=10, fill="both")
 
         self.save_image_button = tk.Button(self.frame_buttons, text="Save Image", command=self.save_image, bg="black", fg="white")
-        self.save_image_button.pack(side="top", pady=10)
+        self.save_image_button.pack(side="top", pady=10, fill="both")
 
         self.remove_effect_button = tk.Button(self.frame_buttons, text="Delete Conversion", command=self.select_filter_to_remove, bg="black", fg="white")
-        self.remove_effect_button.pack(side="top", pady=10)
+        self.remove_effect_button.pack(side="top", pady=10, fill="both")
 
 
     def list_views_config(self):
-        style = ttk.Style()
-        style.configure("Treeview", background="#FFFFFF", fieldbackground="#363636")
-
         self.list_view_effects = ttk.Treeview(self.master)
-        self.list_view_effects.column("#0", width=350, minwidth=210)
+        self.list_view_effects.column("#0", width=525, minwidth=210)
 
         self.list_view_effects.tag_configure("cvt_rgb_2_gray", background="white", foreground="black")
         self.list_view_effects.tag_configure("cvt_rgb_2_xyz", background="white", foreground="black")
@@ -163,141 +160,144 @@ class AppImageManipulation:
         self.list_view_effects.pack(side="left", fill="x")
 
         # Cria um ListView na parte de baixo do frame para mostrar os filtros aplicados
+        style = ttk.Style()
+        style.configure("Treeview", background="#FFFFFF", fieldbackground="#363636")
+
         self.list_view_applied_effects = ttk.Treeview(self.master, style="Treeview")
-        self.list_view_applied_effects.pack(side="left", fill="x")
+        self.list_view_applied_effects.pack(expand=True, side="left", fill="both")
 
     def morph_dilatation(self):
-        if not self.morphology_effect_applied and self.image_path:
+        if self.image_path:
             morphology = Morphology(self.altered_image, "Dilatacao", "dilatation")
-            dilatation_image = morphology.run_morphology()
+            dilatation_image, final_value = morphology.run_morphology()
             if dilatation_image is not None:
-                effect_name = "Dilatação"
+                effect_name = f"Dilatação (Kernel Size: {final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "morph")
                 self.morphology_effect_applied = True
                 self.show_image_effect(dilatation_image)
                 self.applied_effects.append(("morph", morphology))
-        elif self.morphology_effect_applied:
-            messagebox.showinfo("Warning", "Morphology already applied.")
+        # elif self.morphology_effect_applied:
+        #     messagebox.showinfo("Warning", "Morphology already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def morph_erosion(self):
-        if not self.morphology_effect_applied and self.image_path:
+        if self.image_path:
             morphology = Morphology(self.altered_image, "Erosao", "erosion")
-            erosion_image = morphology.run_morphology()
+            erosion_image, final_value = morphology.run_morphology()
             if erosion_image is not None:
-                effect_name = "Erosão"
+                effect_name = f"Erosão (Kernel Size: {final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "morph")
                 self.morphology_effect_applied = True
                 self.show_image_effect(erosion_image)
                 self.applied_effects.append(("morph", morphology))
-        elif self.morphology_effect_applied:
-            messagebox.showinfo("Warning", "Morphology already applied.")
+        # elif self.morphology_effect_applied:
+        #     messagebox.showinfo("Warning", "Morphology already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def threshold_gray(self):
-        if not self.threshold_effect_applied and self.image_path:
+        if self.image_path:
             threshold_gray = Threshold(self.altered_image, "Threshold GRAY", "binarize_gray")
-            binarized_image = threshold_gray.run_threshold()
+            binarized_image, final_value = threshold_gray.run_threshold()
             if binarized_image is not None:
-                effect_name = "Threshold Gray"
+                effect_name = f"Threshold Gray (Binarização: {final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "threshold")
                 self.threshold_effect_applied = True
                 self.show_image_effect(binarized_image)
                 self.applied_effects.append(("threshold", threshold_gray))
-        elif self.threshold_effect_applied:
-            messagebox.showinfo("Warning", "Threshold already applied.")
+        # elif self.threshold_effect_applied:
+        #     messagebox.showinfo("Warning", "Threshold already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def threshold_rgb(self):
-        if not self.threshold_effect_applied and self.image_path:
+        if self.image_path:
             threshold_rgb = Threshold(self.altered_image, "Threshold RGB", "binarize_rgb")
-            binarized_image = threshold_rgb.run_threshold()
+            binarized_image, final_value = threshold_rgb.run_threshold()
             if binarized_image is not None:
-                effect_name = "Threshold"
+                effect_name = f"Threshold (Binarização: {final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "threshold")
                 self.threshold_effect_applied = True
                 self.show_image_effect(binarized_image)
                 self.applied_effects.append(("threshold", threshold_rgb))
-        elif self.threshold_effect_applied:
-            messagebox.showinfo("Warning", "Threshold already applied.")
+        # elif self.threshold_effect_applied:
+        #     messagebox.showinfo("Warning", "Threshold already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def canny_border_detector(self):
-        if not self.border_effect_applied and self.image_path:
+        if self.image_path:
             canny_border = Border(self.altered_image, "Canny Border", "canny")
-            image_canny = canny_border.run_border()
+            image_canny, final_value = canny_border.run_border()
             if image_canny is not None:
-                effect_name = "Detector de borda Canny"
+                effect_name = f"Canny Border ({final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "border")
                 self.border_effect_applied = True
                 self.show_image_effect(image_canny)
                 self.applied_effects.append(("border", canny_border))
-        elif self.border_effect_applied:
-            messagebox.showinfo("Warning", "Border already applied.")
+        # elif self.border_effect_applied:
+        #     messagebox.showinfo("Warning", "Border already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def blur_bilateral_filter(self):
-        if not self.filter_effect_applied and self.image_path:
+        if self.image_path:
             bilateral_filter = Filter(self.altered_image, "Filtro Bilateral", "bilateral")
-            imagem_bilateral = bilateral_filter.run_filter()
+            imagem_bilateral, final_value = bilateral_filter.run_filter()
             if imagem_bilateral is not None:
-                effect_name = "Filtro Bilateral Blur"
+                effect_name = f"Filtro Bilateral Blur ({final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "filter")
                 self.filter_effect_applied = True
                 self.show_image_effect(imagem_bilateral)
                 self.applied_effects.append(("filter", imagem_bilateral))
-        elif self.filter_effect_applied:
-            messagebox.showinfo("Warning", "Filter already applied")
+        # elif self.filter_effect_applied:
+        #     messagebox.showinfo("Warning", "Filter already applied")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def blur_gaussian_filter(self):
-        if not self.filter_effect_applied and self.image_path:
+        if self.image_path:
             gaussian_filter = Filter(self.altered_image, "Filter Gaussian", "gaussian")
-            imagem_gaussian = gaussian_filter.run_filter()
+            imagem_gaussian, final_value = gaussian_filter.run_filter()
             if imagem_gaussian is not None:
-                effect_name = "Filtro Gaussian Blur"
+                effect_name = f"Filtro Gaussian Blur (Sigma: {final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "filter")
                 self.filter_effect_applied = True
                 self.show_image_effect(imagem_gaussian)
                 self.applied_effects.append(("filter", gaussian_filter))
-        elif self.filter_effect_applied:
-            messagebox.showinfo("Warning", "Filter already applied")
+        # elif self.filter_effect_applied:
+        #     messagebox.showinfo("Warning", "Filter already applied")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def blur_median_filter(self):
-        if not self.filter_effect_applied and self.image_path:
+        if self.image_path:
             median_filter = Filter(self.altered_image, "Filter Median", "median")
-            imagem_median = median_filter.run_filter()
+            imagem_median, final_value = median_filter.run_filter()
             if imagem_median is not None:
-                effect_name = "Filtro Median Blur"
+                effect_name = f"Filtro Median Blur (Kernel Size: {final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "filter")
                 self.filter_effect_applied = True
                 self.show_image_effect(imagem_median)
                 self.applied_effects.append(("filter", median_filter))
-        elif self.filter_effect_applied:
-            messagebox.showinfo("Warning", "Filter already applied")
+        # elif self.filter_effect_applied:
+        #     messagebox.showinfo("Warning", "Filter already applied")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def apply_contrast(self):
-        if not self.filter_effect_applied and self.image_path:
+        if self.image_path:
             contrast = Contrast(self.altered_image, "Contraste")
-            imagem_contrast = contrast.run_contrast()
+            imagem_contrast, final_value = contrast.run_contrast()
             if imagem_contrast is not None:
-                effect_name = "Contraste"
+                effect_name = f"Contrast (Alpha: {final_value})"
                 self.add_effect_to_list_view_applied_effects(effect_name, "contrast")
                 self.contrast_effect_applied = True
                 self.show_image_effect(imagem_contrast)
                 self.applied_effects.append(("contrast", contrast))
-        elif self.filter_effect_applied:
-            messagebox.showinfo("Warning", "Contrast already applied.")
+        # elif self.filter_effect_applied:
+        #     messagebox.showinfo("Warning", "Contrast already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
@@ -366,7 +366,7 @@ class AppImageManipulation:
             self.conversion_effect_applied = True
             self.show_image_effect(converted_img)
             self.applied_effects.append(("conversion", converted_img))
-        elif self.conversion_effect_applied:
+        # elif self.conversion_effect_applied:
             messagebox.showinfo("Warning", "Conversion already applied")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
@@ -404,6 +404,7 @@ class AppImageManipulation:
 
     def add_effect_to_list_view_applied_effects(self, effect_name, tag):
         add_effect_to_list_view_applied_effects(self.list_view_applied_effects, effect_name, tag)
+
 
     def remover_filtro(self, tag_item):
         # Remove o filtro que foi selecionado

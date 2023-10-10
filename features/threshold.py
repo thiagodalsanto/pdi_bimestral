@@ -9,10 +9,12 @@ class Threshold:
         self.type_threshold = type_threshold
 
         self.threshold = 128
+        self.final_value = 0
 
     def binarize_rgb(self, value):
         _, binary_image = cv2.threshold(self.original_img, value, 255, cv2.THRESH_BINARY)
         self.altered_img = binary_image
+        self.final_value = self.value
 
         cv2.imshow(self.named_threshold, self.altered_img)
 
@@ -20,6 +22,7 @@ class Threshold:
         gray_image = cv2.cvtColor(self.original_img, cv2.COLOR_RGB2GRAY)
         _, binary_image = cv2.threshold(gray_image, value, 255, cv2.THRESH_BINARY)
         self.altered_img = binary_image
+        self.final_value = self.value
 
         cv2.imshow(self.named_threshold, self.altered_img)
 
@@ -47,6 +50,6 @@ class Threshold:
 
             if tecla == 13:
                 cv2.destroyWindow(self.named_threshold)
-                return self.altered_img
+                return self.altered_img, self.final_value
 
         cv2.destroyAllWindows()

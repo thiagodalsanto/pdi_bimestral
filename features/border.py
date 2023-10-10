@@ -10,6 +10,7 @@ class Border:
 
         self.upper_threshold_canny = 50
         self.bottom_threshold_canny = 150
+        self.final_value = 0
 
     def canny_border_upper(self, valor):
         self.upper_threshold_canny = valor
@@ -21,6 +22,7 @@ class Border:
 
     def update_canny_border(self):
         edges = cv2.Canny(self.original_image, self.bottom_threshold_canny, self.upper_threshold_canny, apertureSize=3, L2gradient=False)
+        self.final_value = f"Upper Border:  {self.upper_threshold_canny}, Bottom Border*2:  {self.bottom_threshold_canny}"
         self.altered_image = edges
 
         cv2.imshow(self.named_border, self.altered_image)
@@ -45,6 +47,6 @@ class Border:
                 break
             if tecla == 13:
                 cv2.destroyWindow(self.named_border)
-                return self.altered_image
+                return self.altered_image, self.final_value
 
         cv2.destroyAllWindows()
