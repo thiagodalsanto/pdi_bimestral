@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import cv2
 from PIL import Image, ImageTk
+from components.image_utils import clear_applied_effects, add_effect_to_list_view_applied_effects
 from features.filter import Filter
 from features.border import Border
 from features.threshold import Threshold
@@ -398,31 +399,11 @@ class AppImageManipulation:
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
-    def add_effect_to_list_view_applied_effects(self, effect_name, tag):
-        if tag == "conversion":
-            self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("conversion",))
-        elif tag == "morph":
-            self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("morph",))
-        elif tag == "filter":
-            self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("filter",))
-        elif tag == "border":
-            self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("border",))
-        elif tag == "threshold":
-            self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("threshold",))
-        elif tag == "contrast":
-            self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("contrast",))
-
-
     def clear_applied_effects(self):
-        # Limpa todos os itens no Bottom List View
-        for item in self.list_view_applied_effects.get_children():
-            self.list_view_applied_effects.delete(item)
-        self.morphology_effect_applied = False
-        self.threshold_effect_applied = False
-        self.border_effect_applied = False
-        self.conversion_effect_applied = False
-        self.filter_effect_applied = False
-        self.contrast_effect_applied = False
+        clear_applied_effects(self.list_view_applied_effects, self.applied_effects)
+
+    def add_effect_to_list_view_applied_effects(self, effect_name, tag):
+        add_effect_to_list_view_applied_effects(self.list_view_applied_effects, effect_name, tag)
 
     def remover_filtro(self, tag_item):
         # Remove o filtro que foi selecionado
