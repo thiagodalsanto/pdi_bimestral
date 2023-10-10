@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 class Morphology:
     def __init__(self, img, named_morphology, type_morphology):
         self.altered_img = np.copy(img)

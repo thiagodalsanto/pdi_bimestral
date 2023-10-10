@@ -2,14 +2,13 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import cv2
 from PIL import Image, ImageTk
-from effects.filter import Filter
-from effects.border import Border
-from effects.threshold import Threshold
-from effects.morphology import Morphology
-from effects.conversion import Conversion
-from effects.contrast import Contrast
+from features.filter import Filter
+from features.border import Border
+from features.threshold import Threshold
+from features.morphology import Morphology
+from features.conversion import Conversion
+from features.contrast import Contrast
 import os
-from matplotlib import pyplot as plt
 
 
 class AppImageManipulation:
@@ -390,8 +389,8 @@ class AppImageManipulation:
             effect_name = "RGB --> GRAY"
             conversion = Conversion(self.altered_image, " ", effect_name)
             converted_img = conversion.run_conversion()
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
             self.conversion_effect_applied = True
+            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
             self.show_image_effect(converted_img)
             self.applied_effects.append(("conversion", converted_img))
         elif self.conversion_effect_applied:
@@ -412,6 +411,7 @@ class AppImageManipulation:
             self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("threshold",))
         elif tag == "contrast":
             self.list_view_applied_effects.insert("", "end", text=effect_name, tags=("contrast",))
+
 
     def clear_applied_effects(self):
         # Limpa todos os itens no Bottom List View
@@ -501,7 +501,6 @@ class AppImageManipulation:
 
     def load_image(self):
         self.original_image = cv2.imread(self.image_path)
-       # self.original_image = cv2.cvtColor(self.original_image.copy(), cv2.COLOR_RGB2BGR)
         self.altered_image = self.original_image.copy()
 
         self.clear_applied_effects()

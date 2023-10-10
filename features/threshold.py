@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 class Threshold:
     def __init__(self, img, named_threshold, type_threshold):
         self.altered_img = np.copy(img)

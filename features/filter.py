@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 class Filter:
     def __init__(self, img, named_filter, type_filter):
         self.imagem_alterada = np.copy(img)

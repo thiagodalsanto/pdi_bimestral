@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 class Conversion:
     def __init__(self, img, named_conversion, type_conversion):
         self.altered_img = np.copy(img)

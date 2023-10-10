@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 
-
 class Border:
     def __init__(self, img, named_border, type_border):
         self.altered_image = np.copy(img)

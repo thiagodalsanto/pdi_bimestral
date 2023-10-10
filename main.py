@@ -1,11 +1,12 @@
 import tkinter as tk
 from components.app_image_manipulation import AppImageManipulation
-from effects.filter import Filter
-from effects.border import Border
-from effects.threshold import Threshold
-from effects.morphology import Morphology
-from effects.conversion import Conversion
-from effects.contrast import Contrast
+from features.filter import Filter
+from features.border import Border
+from features.threshold import Threshold
+from features.morphology import Morphology
+from features.conversion import Conversion
+from features.contrast import Contrast
+
 
 if __name__ == "__main__":
     root = tk.Tk()
