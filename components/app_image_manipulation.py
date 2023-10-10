@@ -76,6 +76,9 @@ class AppImageManipulation:
 
 
     def list_views_config(self):
+        style = ttk.Style()
+        style.configure("Treeview", background="#FFFFFF", fieldbackground="#363636")
+
         self.list_view_effects = ttk.Treeview(self.master)
         self.list_view_effects.column("#0", width=350, minwidth=210)
 
@@ -160,7 +163,7 @@ class AppImageManipulation:
         self.list_view_effects.pack(side="left", fill="x")
 
         # Cria um ListView na parte de baixo do frame para mostrar os filtros aplicados
-        self.list_view_applied_effects = ttk.Treeview(self.master)
+        self.list_view_applied_effects = ttk.Treeview(self.master, style="Treeview")
         self.list_view_applied_effects.pack(side="left", fill="x")
 
     def morph_dilatation(self):
