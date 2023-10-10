@@ -148,58 +148,20 @@ class AppImageManipulation:
 
         self.list_view_effects.tag_configure("morph_erosion", background="white", foreground="black")
         self.list_view_effects.tag_configure("morph_dilatation", background="white", foreground="black")
-        self.list_view_effects.tag_configure("morph_opening", background="white", foreground="black")
-        self.list_view_effects.tag_configure("morph_closure", background="white", foreground="black")
 
         # ListView para Morfologias Matemáticas
         self.list_view_effects.insert("", "end", text="Erosion", tags=("morph_erosion", ))
         self.list_view_effects.insert("", "end", text="Dialtation", tags=("morph_dilatation", ))
-        self.list_view_effects.insert("", "end", text="Openning", tags=("morph_opening", ))
-        self.list_view_effects.insert("", "end", text="Closure", tags=("morph_closure", ))
 
         # Atribuição de funções para as opções de morfologia matemática
         self.list_view_effects.tag_bind("morph_erosion", "<ButtonRelease-1>", lambda evet: self.morph_erosion())
         self.list_view_effects.tag_bind("morph_dilatation", "<ButtonRelease-1>", lambda evet: self.morph_dilatation())
-        self.list_view_effects.tag_bind("morph_opening", "<ButtonRelease-1>", lambda evet: self.morph_opening())
-        self.list_view_effects.tag_bind("morph_closure", "<ButtonRelease-1>", lambda evet: self.morph_closure())
 
         self.list_view_effects.pack(side="left", fill="x")
 
         # Cria um ListView na parte de baixo do frame para mostrar os filtros aplicados
         self.list_view_applied_effects = ttk.Treeview(self.master)
         self.list_view_applied_effects.pack(side="left", fill="x")
-
-    def morph_closure(self):
-        if not self.morphology_effect_applied and self.image_path:
-            effect_name = "Fechamento"
-            self.morph_dilatation()
-            self.morphology_effect_applied = False
-            self.morph_erosion()
-            for item in self.list_view_applied_effects.get_children():
-                item_tags = self.list_view_applied_effects.item(item)["tags"]
-                if 'morph' == item_tags[0]:
-                    self.list_view_applied_effects.delete(item)
-            self.add_effect_to_list_view_applied_effects(effect_name, "morph")
-        elif self.morphology_effect_applied:
-            messagebox.showinfo("Warning", "Morphology already applied.")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
-
-    def morph_opening(self):
-        if not self.morphology_effect_applied and self.image_path:
-            effect_name = "Abertura"
-            self.morph_erosion()
-            self.morphology_effect_applied = False
-            self.morph_dilatation()
-            for item in self.list_view_applied_effects.get_children():
-                item_tags = self.list_view_applied_effects.item(item)["tags"]
-                if 'morph' == item_tags[0]:
-                    self.list_view_applied_effects.delete(item)
-            self.add_effect_to_list_view_applied_effects(effect_name, "morph")
-        elif self.morphology_effect_applied:
-            messagebox.showinfo("Warning", "Morphology already applied.")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
 
     def morph_dilatation(self):
         if not self.morphology_effect_applied and self.image_path:
@@ -603,9 +565,3 @@ class AppImageManipulation:
     def run(self):
         cv2.destroyAllWindows()
         self.master.mainloop()
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = AppImageManipulation(root)
-    app.run()
