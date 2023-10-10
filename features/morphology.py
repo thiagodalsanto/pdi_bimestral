@@ -14,13 +14,13 @@ class Morphology:
     def apply_erosion(self, value):
         kernel = np.ones((value, value), np.uint8)
         self.altered_img = cv2.erode(self.original_img, kernel, iterations=1)
-        self.final_value = self.kernel
+        self.final_value = np.sqrt(np.sum(kernel))
         cv2.imshow(self.named_morphology, self.altered_img)
 
     def apply_dilatation(self, value):
         kernel = np.ones((value, value), np.uint8)
         self.altered_img = cv2.dilate(self.original_img, kernel, iterations=1)
-        self.final_value = self.kernel
+        self.final_value = np.sqrt(np.sum(kernel))
         cv2.imshow(self.named_morphology, self.altered_img)
 
     def run_morphology(self):

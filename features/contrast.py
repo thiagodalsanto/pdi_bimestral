@@ -13,7 +13,7 @@ class Contrast:
 
     def apply_contrast(self):
         self.imagem_alterada = cv2.convertScaleAbs(self.imagem_original, alpha=self.contrast_value / 100.0, beta=0)
-        self.final_value = self.alpha
+        self.final_value = self.contrast_value
         cv2.imshow(self.named_filter, self.imagem_alterada)
 
     def contrast_callback(self, value):
