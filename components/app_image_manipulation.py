@@ -13,18 +13,21 @@ from components.effects.blur.blur_bilateral_filter import BlurBilateralFilterEff
 from components.effects.blur.blur_gaussian_filter import BlurGaussianFilterEffect
 from components.effects.blur.blur_median_filter import BlurMedianFilterEffect
 from components.effects.border.border_canny import CannyBorderEffect
+from components.effects.color_conversion.rgb_2_cielab import RGB2CIELABEffect
+from components.effects.color_conversion.rgb_2_cieluv import RGB2CIELUVEffect
+from components.effects.color_conversion.rgb_2_gray import RGB2GRAYEffect
+from components.effects.color_conversion.rgb_2_hls import RGB2HLSEffect
+from components.effects.color_conversion.rgb_2_hsv import RGB2HSVEffect
+from components.effects.color_conversion.rgb_2_xyz import RGB2XYZEffect
+from components.effects.color_conversion.rgb_2_ycrcb import RGB2YCRCBEffect
+from components.effects.contrast.contrast import ContrastEffect
 from components.effects.morphology.morph_dilatation import MorphDilatationEffect
 from components.effects.morphology.morph_erosion import MorphErosionEffect
 from components.effects.threshold.threshold_gray import ThresholdGrayEffect
 from components.effects.threshold.threshold_rgb import ThresholdRGBEffect
 
-from features.conversion import Conversion
-from features.contrast import Contrast
-
 class AppImageManipulation:
     def __init__(self, master):
-
-        # Define variaveis no construtor
         self.master = master
         self.image_path = None
 
@@ -68,6 +71,14 @@ class AppImageManipulation:
         self.blur_median_filter_effect = BlurMedianFilterEffect(self)
         self.blur_bilateral_filter_effect = BlurBilateralFilterEffect(self)
         self.blur_gaussian_filter_effect = BlurGaussianFilterEffect(self)
+        self.contrast_effect = ContrastEffect(self)
+        self.rgb_2_cielab_effect = RGB2CIELABEffect(self)
+        self.rgb_2_ycrcb_effect = RGB2YCRCBEffect(self)
+        self.rgb_2_hsv_effect = RGB2HSVEffect(self)
+        self.rgb_2_hls_effect = RGB2HLSEffect(self)
+        self.rgb_2_xyz_effect = RGB2XYZEffect(self)
+        self.rgb_2_gray_effect = RGB2GRAYEffect(self)
+        self.rgb_2_cieluv_effect = RGB2CIELUVEffect(self)
 
         config_frame(self)
         list_views_config(self)
@@ -97,122 +108,34 @@ class AppImageManipulation:
         self.blur_gaussian_filter_effect.apply_blur_gaussian()    
 
     def apply_contrast(self):
-        if self.image_path:
-            contrast = Contrast(self.altered_image, "Contraste")
-            imagem_contrast, final_value = contrast.run_contrast()
-            if imagem_contrast is not None:
-                effect_name = f"Contrast (Alpha: {final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "contrast")
-                self.contrast_effect_applied = True
-                self.show_image_effect(imagem_contrast)
-                self.applied_effects.append(("contrast", contrast))
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
-
-    def cvt_rgb_2_cieluv(self):
-        if not self.conversion_effect_applied and self.image_path:
-            effect_name = "RGB --> CIE L*u*v*"
-            conversion = Conversion(self.altered_image, " ", effect_name)
-            converted_img = conversion.run_conversion()
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
-            self.conversion_effect_applied = True
-            self.show_image_effect(converted_img)
-            self.applied_effects.append(("conversion", converted_img))
-        elif self.conversion_effect_applied:
-            messagebox.showinfo("Warning", "Conversion already applied")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.contrast_effect.apply_contrast()
 
     def cvt_rgb_2_cielab(self):
-        if not self.conversion_effect_applied and self.image_path:
-            effect_name = "RGB --> CIE L*a*b*"
-            conversion = Conversion(self.altered_image, " ", effect_name)
-            converted_img = conversion.run_conversion()
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
-            self.conversion_effect_applied = True
-            self.show_image_effect(converted_img)
-            self.applied_effects.append(("conversion", converted_img))
-        elif self.conversion_effect_applied:
-            messagebox.showinfo("Warning", "Conversion already applied")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
-
-    def cvt_rgb_2_hls(self):
-        if not self.conversion_effect_applied and self.image_path:
-            effect_name = "RGB --> HLS"
-            conversion = Conversion(self.altered_image, " ", effect_name)
-            converted_img = conversion.run_conversion()
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
-            self.conversion_effect_applied = True
-            self.show_image_effect(converted_img)
-            self.applied_effects.append(("conversion", converted_img))
-        elif self.conversion_effect_applied:
-            messagebox.showinfo("Warning", "Conversion already applied")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.rgb_2_cielab_effect.cvt_rgb_2_cielab()
+    
+    def cvt_rgb_2_ycrcb(self):
+        self.rgb_2_ycrcb_effect.cvt_rgb_2_ycrcb()
 
     def cvt_rgb_2_hsv(self):
-        if not self.conversion_effect_applied and self.image_path:
-            effect_name = "RGB --> HSV"
-            conversion = Conversion(self.altered_image, " ", effect_name)
-            converted_img = conversion.run_conversion()
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
-            self.conversion_effect_applied = True
-            self.show_image_effect(converted_img)
-            self.applied_effects.append(("conversion", converted_img))
-        elif self.conversion_effect_applied:
-            messagebox.showinfo("Warning", "Conversion already applied")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
-
-    def cvt_rgb_2_ycrcb(self):
-        if not self.conversion_effect_applied and self.image_path:
-            effect_name = "RGB --> YCrCb"
-            conversion = Conversion(self.altered_image, " ", effect_name)
-            converted_img = conversion.run_conversion()
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
-            self.conversion_effect_applied = True
-            self.show_image_effect(converted_img)
-            self.applied_effects.append(("conversion", converted_img))
-        # elif self.conversion_effect_applied:
-            messagebox.showinfo("Warning", "Conversion already applied")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.rgb_2_hsv_effect.cvt_rgb_2_hsv()
+    
+    def cvt_rgb_2_hls(self):
+        self.rgb_2_hls_effect.cvt_rgb_2_hls()
 
     def cvt_rgb_2_xyz(self):
-        if not self.conversion_effect_applied and self.image_path:
-            effect_name = "RGB --> XYZ"
-            conversion = Conversion(self.altered_image, " ", effect_name)
-            converted_img = conversion.run_conversion()
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
-            self.conversion_effect_applied = True
-            self.show_image_effect(converted_img)
-            self.applied_effects.append(("conversion", converted_img))
-        elif self.conversion_effect_applied:
-            messagebox.showinfo("Warning", "Conversion already applied")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.rgb_2_xyz_effect.cvt_rgb_2_xyz()
 
     def cvt_rgb_2_gray(self):
-        if not self.conversion_effect_applied and self.image_path:
-            effect_name = "RGB --> GRAY"
-            conversion = Conversion(self.altered_image, " ", effect_name)
-            converted_img = conversion.run_conversion()
-            self.conversion_effect_applied = True
-            self.add_effect_to_list_view_applied_effects(effect_name, "conversion")
-            self.show_image_effect(converted_img)
-            self.applied_effects.append(("conversion", converted_img))
-        elif self.conversion_effect_applied:
-            messagebox.showinfo("Warning", "Conversion already applied")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.rgb_2_gray_effect.cvt_rgb_2_gray()
+
+    def cvt_rgb_2_cieluv(self):
+        self.rgb_2_cieluv_effect.cvt_rgb_2_cieluv()
 
     def clear_applied_effects(self):
         clear_applied_effects(self.list_view_applied_effects, self.applied_effects)
 
     def add_effect_to_list_view_applied_effects(self, effect_name, tag):
         add_effect_to_list_view_applied_effects(self.list_view_applied_effects, effect_name, tag)
-
 
     def remover_filtro(self, tag_item):
         # Remove o filtro que foi selecionado
