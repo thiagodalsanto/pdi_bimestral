@@ -1,16 +1,23 @@
+import cv2
+import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-import cv2
 from PIL import Image, ImageTk
-from components.image_utils import clear_applied_effects, add_effect_to_list_view_applied_effects
+
+from components.UI.config_frame import config_frame
+from components.UI.list_views_config import list_views_config
+from components.clear_applied_effects import clear_applied_effects
+from components.add_effect_list_applied import add_effect_to_list_view_applied_effects
+
+from components.effects.morphology.morph_dilatation import MorphDilatationEffect
+from components.effects.morphology.morph_erosion import MorphErosionEffect
+from components.effects.threshold.threshold_gray import ThresholdGrayEffect
+from components.effects.threshold.threshold_rgb import ThresholdRGBEffect
+
 from features.filter import Filter
 from features.border import Border
-from features.threshold import Threshold
-from features.morphology import Morphology
 from features.conversion import Conversion
 from features.contrast import Contrast
-import os
-
 
 class AppImageManipulation:
     def __init__(self, master):
@@ -51,180 +58,25 @@ class AppImageManipulation:
 
         self.directory = "images/"
 
-        self.config_frame()
-        self.list_views_config()
+        self.morph_dilatation_effect = MorphDilatationEffect(self)
+        self.morph_erosion_effect = MorphErosionEffect(self)
+        self.threshold_rgb_effect = ThresholdRGBEffect(self)
+        self.threshold_gray_effect = ThresholdGrayEffect(self)
 
-    def config_frame(self):
-        self.master.title("PDI Bimestral")
-        self.master.geometry("1200x550")
-        self.master.configure(bg="#363636")
-
-        self.frame_image = tk.Frame(self.master)
-        self.frame_image.pack(expand=True, fill="both")
-
-        self.frame_buttons = tk.Frame(self.master, bg="#363636")
-        self.frame_buttons.pack(side="right", pady=10, padx=10)
-
-        self.load_image_button = tk.Button(self.frame_buttons, text="Send Image", command=self.open_file, bg="black", fg="white")
-        self.load_image_button.pack(side="top", pady=10, fill="both")
-
-        self.save_image_button = tk.Button(self.frame_buttons, text="Save Image", command=self.save_image, bg="black", fg="white")
-        self.save_image_button.pack(side="top", pady=10, fill="both")
-
-        self.remove_effect_button = tk.Button(self.frame_buttons, text="Delete Conversion", command=self.select_filter_to_remove, bg="black", fg="white")
-        self.remove_effect_button.pack(side="top", pady=10, fill="both")
-
-
-    def list_views_config(self):
-        self.list_view_effects = ttk.Treeview(self.master)
-        self.list_view_effects.column("#0", width=525, minwidth=210)
-
-        self.list_view_effects.tag_configure("cvt_rgb_2_gray", background="white", foreground="black")
-        self.list_view_effects.tag_configure("cvt_rgb_2_xyz", background="white", foreground="black")
-        self.list_view_effects.tag_configure("cvt_rgb_2_ycrcb", background="white", foreground="black")
-        self.list_view_effects.tag_configure("cvt_rgb_2_hsv", background="white", foreground="black")
-        self.list_view_effects.tag_configure("cvt_rgb_2_hls", background="white", foreground="black")
-        self.list_view_effects.tag_configure("cvt_rgb_2_cielab", background="white", foreground="black")
-        self.list_view_effects.tag_configure("cvt_rgb_2_cieluv", background="white", foreground="black")
-
-        # ListView Para conversões de cores
-        self.list_view_effects.insert("", "end", text="Convert RGB --> GRAY", tags=("cvt_rgb_2_gray",))
-        self.list_view_effects.insert("", "end", text="Convert RGB --> XYZ", tags=("cvt_rgb_2_xyz",))
-        self.list_view_effects.insert("", "end", text="Convert RGB --> YCrCb", tags=("cvt_rgb_2_ycrcb",))
-        self.list_view_effects.insert("", "end", text="Convert RGB --> HSV", tags=("cvt_rgb_2_hsv",))
-        self.list_view_effects.insert("", "end", text="Convert RGB --> HLS", tags=("cvt_rgb_2_hls",))
-        self.list_view_effects.insert("", "end", text="Convert RGB --> CIE L*a*b*", tags=("cvt_rgb_2_cielab",))
-        self.list_view_effects.insert("", "end", text="Convert RGB --> CIE L*u*v*", tags=("cvt_rgb_2_cieluv",))
-
-        # Atribuição de funções para as opções do ListView de conversão de cores.
-        self.list_view_effects.tag_bind("cvt_rgb_2_gray", "<ButtonRelease-1>", lambda event: self.cvt_rgb_2_gray())
-        self.list_view_effects.tag_bind("cvt_rgb_2_xyz", "<ButtonRelease-1>", lambda event: self.cvt_rgb_2_xyz())
-        self.list_view_effects.tag_bind("cvt_rgb_2_ycrcb", "<ButtonRelease-1>", lambda event: self.cvt_rgb_2_ycrcb())
-        self.list_view_effects.tag_bind("cvt_rgb_2_hsv", "<ButtonRelease-1>", lambda event: self.cvt_rgb_2_hsv())
-        self.list_view_effects.tag_bind("cvt_rgb_2_hls", "<ButtonRelease-1>", lambda event: self.cvt_rgb_2_hls())
-        self.list_view_effects.tag_bind("cvt_rgb_2_cielab", "<ButtonRelease-1>", lambda event: self.cvt_rgb_2_cielab())
-        self.list_view_effects.tag_bind("cvt_rgb_2_cieluv", "<ButtonRelease-1>", lambda event: self.cvt_rgb_2_cieluv())
-
-        self.list_view_effects.tag_configure("contrast", background="black", foreground="white")
-        
-        #ListView para Constraste
-        self.list_view_effects.insert("", "end", text="Contrast", tags=("contrast", ))
-
-        #Atribuição de funções para a opção de contraste
-        self.list_view_effects.tag_bind("contrast", "<ButtonRelease-1>", lambda event: self.apply_contrast())
-
-        self.list_view_effects.tag_configure("blur_median_filter", background="black", foreground="white")
-        self.list_view_effects.tag_configure("blur_gaussian_filter", background="black", foreground="white")
-        self.list_view_effects.tag_configure("blur_bilateral_filter", background="black", foreground="white")
-
-        # ListView para Filtros
-        self.list_view_effects.insert("", "end", text="Median Blur", tags=("blur_median_filter", ))
-        self.list_view_effects.insert("", "end", text="Gaussian Blur", tags=("blur_gaussian_filter", ))
-        self.list_view_effects.insert("", "end", text="Bilateral Blur", tags=("blur_bilateral_filter", ))
-
-        # Atribuição de funções para as opções do ListView filtros.
-        self.list_view_effects.tag_bind("blur_median_filter", "<ButtonRelease-1>", lambda event: self.blur_median_filter())
-        self.list_view_effects.tag_bind("blur_gaussian_filter", "<ButtonRelease-1>", lambda event: self.blur_gaussian_filter())
-        self.list_view_effects.tag_bind("blur_bilateral_filter", "<ButtonRelease-1>", lambda event: self.blur_bilateral_filter())
-
-        self.list_view_effects.tag_configure("canny_border_detector", background="white", foreground="black")
-
-        # ListView para detector de bordas
-        self.list_view_effects.insert("", "end", text="Canny", tags=("canny_border_detector", ))
-
-        # Atribuição de funções para as opções do ListView de detecção de bordas
-        self.list_view_effects.tag_bind("canny_border_detector", "<ButtonRelease-1>", lambda event: self.canny_border_detector())
-
-        self.list_view_effects.tag_configure("threshold_rgb", background="black", foreground="white")
-        self.list_view_effects.tag_configure("threshold_gray", background="black", foreground="white")
-
-        # ListView para threshold
-        self.list_view_effects.insert("", "end", text="Threshold (RGB)", tags=("threshold_rgb", ))
-        self.list_view_effects.insert("", "end", text="Threshold (GRAY)", tags=("threshold_gray", ))
-
-        # Atribuição de funções para as opções de threshold
-        self.list_view_effects.tag_bind("threshold_rgb", "<ButtonRelease-1>", lambda event: self.threshold_rgb())
-        self.list_view_effects.tag_bind("threshold_gray", "<ButtonRelease-1>", lambda event: self.threshold_gray())
-
-        self.list_view_effects.tag_configure("morph_erosion", background="white", foreground="black")
-        self.list_view_effects.tag_configure("morph_dilatation", background="white", foreground="black")
-
-        # ListView para Morfologias Matemáticas
-        self.list_view_effects.insert("", "end", text="Erosion", tags=("morph_erosion", ))
-        self.list_view_effects.insert("", "end", text="Dialtation", tags=("morph_dilatation", ))
-
-        # Atribuição de funções para as opções de morfologia matemática
-        self.list_view_effects.tag_bind("morph_erosion", "<ButtonRelease-1>", lambda evet: self.morph_erosion())
-        self.list_view_effects.tag_bind("morph_dilatation", "<ButtonRelease-1>", lambda evet: self.morph_dilatation())
-
-        self.list_view_effects.pack(side="left", fill="x")
-
-        # Cria um ListView na parte de baixo do frame para mostrar os filtros aplicados
-        style = ttk.Style()
-        style.configure("Treeview", background="#FFFFFF", fieldbackground="#363636")
-
-        self.list_view_applied_effects = ttk.Treeview(self.master, style="Treeview")
-        self.list_view_applied_effects.pack(expand=True, side="left", fill="both")
+        config_frame(self)
+        list_views_config(self)
 
     def morph_dilatation(self):
-        if self.image_path:
-            morphology = Morphology(self.altered_image, "Dilatacao", "dilatation")
-            dilatation_image, final_value = morphology.run_morphology()
-            if dilatation_image is not None:
-                effect_name = f"Dilatação (Kernel Size: {final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "morph")
-                self.morphology_effect_applied = True
-                self.show_image_effect(dilatation_image)
-                self.applied_effects.append(("morph", morphology))
-        # elif self.morphology_effect_applied:
-        #     messagebox.showinfo("Warning", "Morphology already applied.")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.morph_dilatation_effect.apply_morph_dilatation()
 
     def morph_erosion(self):
-        if self.image_path:
-            morphology = Morphology(self.altered_image, "Erosao", "erosion")
-            erosion_image, final_value = morphology.run_morphology()
-            if erosion_image is not None:
-                effect_name = f"Erosão (Kernel Size: {final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "morph")
-                self.morphology_effect_applied = True
-                self.show_image_effect(erosion_image)
-                self.applied_effects.append(("morph", morphology))
-        # elif self.morphology_effect_applied:
-        #     messagebox.showinfo("Warning", "Morphology already applied.")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
-
-    def threshold_gray(self):
-        if self.image_path:
-            threshold_gray = Threshold(self.altered_image, "Threshold GRAY", "binarize_gray")
-            binarized_image, final_value = threshold_gray.run_threshold()
-            if binarized_image is not None:
-                effect_name = f"Threshold Gray (Binarização: {final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "threshold")
-                self.threshold_effect_applied = True
-                self.show_image_effect(binarized_image)
-                self.applied_effects.append(("threshold", threshold_gray))
-        # elif self.threshold_effect_applied:
-        #     messagebox.showinfo("Warning", "Threshold already applied.")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.morph_erosion_effect.apply_morph_erosion()
 
     def threshold_rgb(self):
-        if self.image_path:
-            threshold_rgb = Threshold(self.altered_image, "Threshold RGB", "binarize_rgb")
-            binarized_image, final_value = threshold_rgb.run_threshold()
-            if binarized_image is not None:
-                effect_name = f"Threshold (Binarização: {final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "threshold")
-                self.threshold_effect_applied = True
-                self.show_image_effect(binarized_image)
-                self.applied_effects.append(("threshold", threshold_rgb))
-        # elif self.threshold_effect_applied:
-        #     messagebox.showinfo("Warning", "Threshold already applied.")
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.threshold_rgb_effect.apply_threshold_rgb()
+    
+    def threshold_gray(self):
+        self.threshold_gray_effect.apply_threshold_gray()
 
     def canny_border_detector(self):
         if self.image_path:
@@ -236,8 +88,6 @@ class AppImageManipulation:
                 self.border_effect_applied = True
                 self.show_image_effect(image_canny)
                 self.applied_effects.append(("border", canny_border))
-        # elif self.border_effect_applied:
-        #     messagebox.showinfo("Warning", "Border already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
@@ -251,8 +101,6 @@ class AppImageManipulation:
                 self.filter_effect_applied = True
                 self.show_image_effect(imagem_bilateral)
                 self.applied_effects.append(("filter", imagem_bilateral))
-        # elif self.filter_effect_applied:
-        #     messagebox.showinfo("Warning", "Filter already applied")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
@@ -266,8 +114,6 @@ class AppImageManipulation:
                 self.filter_effect_applied = True
                 self.show_image_effect(imagem_gaussian)
                 self.applied_effects.append(("filter", gaussian_filter))
-        # elif self.filter_effect_applied:
-        #     messagebox.showinfo("Warning", "Filter already applied")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
@@ -281,8 +127,6 @@ class AppImageManipulation:
                 self.filter_effect_applied = True
                 self.show_image_effect(imagem_median)
                 self.applied_effects.append(("filter", median_filter))
-        # elif self.filter_effect_applied:
-        #     messagebox.showinfo("Warning", "Filter already applied")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
@@ -296,8 +140,6 @@ class AppImageManipulation:
                 self.contrast_effect_applied = True
                 self.show_image_effect(imagem_contrast)
                 self.applied_effects.append(("contrast", contrast))
-        # elif self.filter_effect_applied:
-        #     messagebox.showinfo("Warning", "Contrast already applied.")
         else:
             messagebox.showwarning("Warning", "Load image first, then convert.")
 
