@@ -9,13 +9,13 @@ from components.UI.list_views_config import list_views_config
 from components.clear_applied_effects import clear_applied_effects
 from components.add_effect_list_applied import add_effect_to_list_view_applied_effects
 
+from components.effects.border.border_canny import CannyBorderEffect
 from components.effects.morphology.morph_dilatation import MorphDilatationEffect
 from components.effects.morphology.morph_erosion import MorphErosionEffect
 from components.effects.threshold.threshold_gray import ThresholdGrayEffect
 from components.effects.threshold.threshold_rgb import ThresholdRGBEffect
 
 from features.filter import Filter
-from features.border import Border
 from features.conversion import Conversion
 from features.contrast import Contrast
 
@@ -62,6 +62,7 @@ class AppImageManipulation:
         self.morph_erosion_effect = MorphErosionEffect(self)
         self.threshold_rgb_effect = ThresholdRGBEffect(self)
         self.threshold_gray_effect = ThresholdGrayEffect(self)
+        self.canny_border_effect = CannyBorderEffect(self)
 
         config_frame(self)
         list_views_config(self)
@@ -79,17 +80,7 @@ class AppImageManipulation:
         self.threshold_gray_effect.apply_threshold_gray()
 
     def canny_border_detector(self):
-        if self.image_path:
-            canny_border = Border(self.altered_image, "Canny Border", "canny")
-            image_canny, final_value = canny_border.run_border()
-            if image_canny is not None:
-                effect_name = f"Canny Border ({final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "border")
-                self.border_effect_applied = True
-                self.show_image_effect(image_canny)
-                self.applied_effects.append(("border", canny_border))
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.canny_border_effect.apply_canny_border()
 
     def blur_bilateral_filter(self):
         if self.image_path:
