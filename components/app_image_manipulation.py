@@ -6,8 +6,8 @@ from PIL import Image, ImageTk
 
 from components.UI.config_frame import config_frame
 from components.UI.list_views_config import list_views_config
-from components.clear_applied_effects import clear_applied_effects
-from components.add_effect_list_applied import add_effect_to_list_view_applied_effects
+from components.effects_functions.clear_applied_effects import clear_applied_effects
+from components.effects_functions.add_effect_list_applied import add_effect_to_list_view_applied_effects
 
 from components.effects.blur.blur_bilateral_filter import BlurBilateralFilterEffect
 from components.effects.blur.blur_gaussian_filter import BlurGaussianFilterEffect
