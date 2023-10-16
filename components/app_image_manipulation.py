@@ -9,13 +9,15 @@ from components.UI.list_views_config import list_views_config
 from components.clear_applied_effects import clear_applied_effects
 from components.add_effect_list_applied import add_effect_to_list_view_applied_effects
 
+from components.effects.blur.blur_bilateral_filter import BlurBilateralFilterEffect
+from components.effects.blur.blur_gaussian_filter import BlurGaussianFilterEffect
+from components.effects.blur.blur_median_filter import BlurMedianFilterEffect
 from components.effects.border.border_canny import CannyBorderEffect
 from components.effects.morphology.morph_dilatation import MorphDilatationEffect
 from components.effects.morphology.morph_erosion import MorphErosionEffect
 from components.effects.threshold.threshold_gray import ThresholdGrayEffect
 from components.effects.threshold.threshold_rgb import ThresholdRGBEffect
 
-from features.filter import Filter
 from features.conversion import Conversion
 from features.contrast import Contrast
 
@@ -63,6 +65,9 @@ class AppImageManipulation:
         self.threshold_rgb_effect = ThresholdRGBEffect(self)
         self.threshold_gray_effect = ThresholdGrayEffect(self)
         self.canny_border_effect = CannyBorderEffect(self)
+        self.blur_median_filter_effect = BlurMedianFilterEffect(self)
+        self.blur_bilateral_filter_effect = BlurBilateralFilterEffect(self)
+        self.blur_gaussian_filter_effect = BlurGaussianFilterEffect(self)
 
         config_frame(self)
         list_views_config(self)
@@ -80,46 +85,16 @@ class AppImageManipulation:
         self.threshold_gray_effect.apply_threshold_gray()
 
     def canny_border_detector(self):
-        self.canny_border_effect.apply_canny_border()
-
-    def blur_bilateral_filter(self):
-        if self.image_path:
-            bilateral_filter = Filter(self.altered_image, "Filtro Bilateral", "bilateral")
-            imagem_bilateral, final_value = bilateral_filter.run_filter()
-            if imagem_bilateral is not None:
-                effect_name = f"Filtro Bilateral Blur ({final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "filter")
-                self.filter_effect_applied = True
-                self.show_image_effect(imagem_bilateral)
-                self.applied_effects.append(("filter", imagem_bilateral))
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
-
-    def blur_gaussian_filter(self):
-        if self.image_path:
-            gaussian_filter = Filter(self.altered_image, "Filter Gaussian", "gaussian")
-            imagem_gaussian, final_value = gaussian_filter.run_filter()
-            if imagem_gaussian is not None:
-                effect_name = f"Filtro Gaussian Blur (Sigma: {final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "filter")
-                self.filter_effect_applied = True
-                self.show_image_effect(imagem_gaussian)
-                self.applied_effects.append(("filter", gaussian_filter))
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.canny_border_effect.apply_canny_border()    
 
     def blur_median_filter(self):
-        if self.image_path:
-            median_filter = Filter(self.altered_image, "Filter Median", "median")
-            imagem_median, final_value = median_filter.run_filter()
-            if imagem_median is not None:
-                effect_name = f"Filtro Median Blur (Kernel Size: {final_value})"
-                self.add_effect_to_list_view_applied_effects(effect_name, "filter")
-                self.filter_effect_applied = True
-                self.show_image_effect(imagem_median)
-                self.applied_effects.append(("filter", median_filter))
-        else:
-            messagebox.showwarning("Warning", "Load image first, then convert.")
+        self.blur_median_filter_effect.apply_median_blur()
+
+    def blur_bilateral_filter(self):
+        self.blur_bilateral_filter_effect.apply_blur_bilateral()
+
+    def blur_gaussian_filter(self):
+        self.blur_gaussian_filter_effect.apply_blur_gaussian()    
 
     def apply_contrast(self):
         if self.image_path:
