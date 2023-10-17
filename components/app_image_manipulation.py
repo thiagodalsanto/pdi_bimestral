@@ -25,6 +25,7 @@ from components.effects.morphology.morph_dilatation import MorphDilatationEffect
 from components.effects.morphology.morph_erosion import MorphErosionEffect
 from components.effects.threshold.threshold_gray import ThresholdGrayEffect
 from components.effects.threshold.threshold_rgb import ThresholdRGBEffect
+from components.effects_functions.filter_removal import FilterRemoval
 
 class AppImageManipulation:
     def __init__(self, master):
@@ -79,6 +80,8 @@ class AppImageManipulation:
         self.rgb_2_xyz_effect = RGB2XYZEffect(self)
         self.rgb_2_gray_effect = RGB2GRAYEffect(self)
         self.rgb_2_cieluv_effect = RGB2CIELUVEffect(self)
+        self.filter_removal = FilterRemoval(self)
+
 
         config_frame(self)
         list_views_config(self)
@@ -137,92 +140,17 @@ class AppImageManipulation:
     def add_effect_to_list_view_applied_effects(self, effect_name, tag):
         add_effect_to_list_view_applied_effects(self.list_view_applied_effects, effect_name, tag)
 
-    def remover_filtro(self, tag_item):
-        # Remove o filtro que foi selecionado
-        self.applied_effects = [op for op in self.applied_effects if op[0] != tag_item]
-
-        # salva uma cópia da imagem original para reconstrução dos filtros
-        imagem_sem_filtro = self.original_image.copy()
-
-        # Tenta aplicar o filtro na ordem que foi aplicado inicialmente
-        for effect_type, effect in self.applied_effects:
-            if effect_type == "conversion":
-                imagem_sem_filtro = effect.copy()
-            elif effect_type == "morph":
-                imagem_sem_filtro = effect.run_morphology(imagem_sem_filtro)
-            elif effect_type == "filter":
-                imagem_sem_filtro = effect.run_filter(imagem_sem_filtro)
-            elif effect_type == "border":
-                imagem_sem_filtro = effect.run_border(imagem_sem_filtro)
-            elif effect_type == "threshold":
-                imagem_sem_filtro = effect.run_threshold(imagem_sem_filtro)
-            elif effect_type == "contrast":
-                imagem_sem_filtro = effect.run_contrast(imagem_sem_filtro)
-
-        # Atualiza a imagem alterada no frame
-        if self.label_altered_image:
-            self.label_altered_image.destroy()
-            self.resize_altered_image(imagem_sem_filtro)
-
-        # Remove os efeitos aplicados do Bottom List View
-        for item in self.list_view_applied_effects.get_children():
-            item_tags = self.list_view_applied_effects.item(item)["tags"]
-            if tag_item in item_tags:
-                self.list_view_applied_effects.delete(item)
-
-        # Redefina as flags de efeitos aplicados
-        if tag_item == "conversion":
-            self.conversion_effect_applied = False
-        elif tag_item == "morph":
-            self.morphology_effect_applied = False
-        elif tag_item == "filter":
-            self.filter_effect_applied = False
-        elif tag_item == "border":
-            self.border_effect_applied = False
-        elif tag_item == "threshold":
-            self.threshold_effect_applied = False
-        elif tag_item == "contrast":
-            self.contrast_effect_applied = False
-
     def select_filter_to_remove(self):
         selected_item = self.list_view_applied_effects.selection()
         if selected_item:
             effect_text = self.list_view_applied_effects.item(selected_item)
             tag_item = str(effect_text.__getitem__("tags")[0])
 
-            self.remover_filtro(tag_item)
+            self.filter_removal.remove_filter(tag_item)
         else:
-            messagebox.showinfo("Warning", "Select a convertion to be deleted.")
-
-    def save_image(self):
-
-        # Cria diretorio de não existe
-        if not os.path.exists(self.directory):
-            os.makedirs(self.directory)
-
-        while True:
-            filename = f'image_{self.count_save_files}.jpg'
-            file_path = os.path.join(self.directory, filename)
-
-            # Incrementa se já existir algum arquivo com o número atual
-            if os.path.exists(file_path):
-                self.count_save_files += 1
-            else:
-                cv2.imwrite(file_path, self.altered_image)
-                print(f'Image save as {filename}')
-                break
-
-    def load_image(self):
-        self.original_image = cv2.imread(self.image_path)
-        self.altered_image = self.original_image.copy()
-
-        self.clear_applied_effects()
-        self.show_original_image(self.original_image.copy())
-        self.resulted_image = None
-        self.show_image_effect(self.altered_image.copy())
+            messagebox.showinfo("Warning", "Select a conversion to be deleted.")
 
     def show_image_effect(self, img):
-
         if self.label_altered_image:
             self.label_altered_image.destroy()
 
@@ -267,15 +195,6 @@ class AppImageManipulation:
         self.label_original_image.pack(expand=True, fill="both", side="left")
 
         self.frame_image.update_idletasks()
-
-    def open_file(self):
-        self.image_path = filedialog.askopenfilename()
-
-        if self.image_path:
-            print('Selected Archive', self.image_path)
-            self.load_image()
-        else:
-            print('No archive selected')
 
     def run(self):
         cv2.destroyAllWindows()
