@@ -6,12 +6,12 @@ from components.effects_functions.add_effect_list_applied import add_effect_to_l
 from components.UI.config_frame import config_frame
 from components.UI.list_views_config import list_views_config
 
-from features.filter import Filter
-from features.border import Border
-from features.threshold import Threshold
-from features.morphology import Morphology
-from features.conversion import Conversion
-from features.contrast import Contrast
+from opencv_models.filter import Filter
+from opencv_models.border import Border
+from opencv_models.threshold import Threshold
+from opencv_models.morphology import Morphology
+from opencv_models.conversion import Conversion
+from opencv_models.contrast import Contrast
 
 if __name__ == "__main__":
     root = tk.Tk()

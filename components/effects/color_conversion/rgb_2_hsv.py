@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from features.conversion import Conversion
+from opencv_models.conversion import Conversion
 
 class RGB2HSVEffect:
     def __init__(self, app_instance):

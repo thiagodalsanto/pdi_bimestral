@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from features.contrast import Contrast
+from opencv_models.contrast import Contrast
 
 class ContrastEffect:
     def __init__(self, app_instance):

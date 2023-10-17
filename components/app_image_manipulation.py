@@ -1,7 +1,7 @@
 import cv2
 import os
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import messagebox
 from PIL import Image, ImageTk
 
 from components.UI.config_frame import config_frame

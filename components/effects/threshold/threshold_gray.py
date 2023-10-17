@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from features.threshold import Threshold
+from opencv_models.threshold import Threshold
 
 class ThresholdGrayEffect:
     def __init__(self, app_instance):

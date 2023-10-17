@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from features.filter import Filter
+from opencv_models.filter import Filter
 
 class BlurMedianFilterEffect:
     def __init__(self, app_instance):

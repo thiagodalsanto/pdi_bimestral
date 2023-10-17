@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from features.border import Border
+from opencv_models.border import Border
 
 class CannyBorderEffect:
     def __init__(self, app_instance):

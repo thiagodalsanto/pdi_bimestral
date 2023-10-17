@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from features.morphology import Morphology
+from opencv_models.morphology import Morphology
 
 class MorphDilatationEffect:
     def __init__(self, app_instance):
